@@ -24,8 +24,7 @@
             font-family: "Times New Roman", serif;
         }
 
-        /* Top Sectie: Geschiedenis & Instructies */
-        .header-container {
+        .info-box {
             background-color: var(--info-bg);
             width: 100%;
             max-width: 420px;
@@ -35,13 +34,19 @@
             margin-bottom: 10px;
             box-sizing: border-box;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
         }
 
-        .header-container h2 { color: var(--romano-red); margin: 0 0 10px 0; font-size: 1.1rem; text-align: center; }
-        .instruzioni { font-size: 0.8rem; line-height: 1.3; color: #333; }
+        .instruzioni { 
+            width: 100%;
+            max-width: 420px;
+            font-size: 0.8rem; 
+            line-height: 1.3; 
+            color: #333; 
+            margin-bottom: 10px;
+        }
         .instruzioni b { color: var(--romano-red); }
 
-        /* Midden Sectie: Het Spel */
         .spel-container {
             background-color: var(--parchment); 
             width: 100%;
@@ -58,24 +63,25 @@
         #bord-vlak { 
             position: relative; 
             width: 100%; 
-            aspect-ratio: 2 / 1.1; 
+            aspect-ratio: 1.5 / 1; 
             margin: 15px auto;
             touch-action: none;
+            overflow: visible;
         }
 
-        svg { width: 100%; height: 100%; display: block; }
-        .lijn { stroke: #4a3728; stroke-width: 4; stroke-linecap: round; fill: none; }
+        svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+        .lijn { stroke: #4a3728; stroke-width: 5; stroke-linecap: round; fill: none; }
 
         .pion {
             width: 12%; aspect-ratio: 1 / 1; border-radius: 50%;
             position: absolute; cursor: grab; z-index: 10;
             touch-action: none; box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             border: 2px solid #333; transform: translate(-50%, -50%);
+            pointer-events: auto;
         }
         .jager { background: radial-gradient(circle at 30% 30%, #444, #000); }
         .prooi { background: radial-gradient(circle at 30% 30%, #fff, #ccc); }
 
-        /* Bottom Sectie: Scores */
         .score-container {
             width: 100%;
             max-width: 420px;
@@ -99,7 +105,7 @@
             border: 1px solid var(--romano-red);
             border-top: none;
             border-radius: 0 0 8px 8px;
-            max-height: 150px;
+            max-height: 120px;
             overflow-y: auto;
             padding: 5px;
         }
@@ -128,59 +134,54 @@
 </head>
 <body>
 
-     <div class="info-box">
+    <div class="info-box">
         <strong>Storia / Geschiedenis:</strong><br>
         <i>Herontdekt door archeologen. Een strategisch Romeins duel tussen jagers en prooi.</i><br>
-        Riscoperto dagli archeologi. Un duello Romane strategico tra cacciatori e preda.
+        Riscoperto dagli archeologi. Un duello strategico Romane tra cacciatori e preda.
         <hr style="border: 0; border-top: 1px dotted var(--romano-red);">
         <strong>Regole / Regels:</strong><br>
         • Cacciatori (Neri): bloccano la preda. / Jagers (Zwart): sluit de prooi in.<br>
         • Preda (Bianca): cerca di scappare. / Prooi (Wit): probeer te ontsnappen.
     </div> 
 
- <div class="instruzioni">
-            <b>Jager (4 pionnen) vs Prooi (2 pionnen)</b>. De jager begint.<br>
-<b>Cacciatore (4 pedine) contro Preda (2 pedine)</b>. Il cacciatore inizia.<br>
-
-
-            • Spelers bewegen om de beurt 1 kruispunt over de lijnen.<br>
-           • I giocatori si muovono a turno di 1 incrocio lungo le linee.<br>
-            • Je mag niet springen. Pionnen mogen niet op dezelfde plek staan.<br>
-            • Non è consentito saltare. Le pedine non possono trovarsi nella stessa posizione.<br>
-            • <b>Einde:</b> Als beide prooien zijn ingesloten. Wie de prooi in de minste zetten blokkeert, wint!<br>
-           • Fine: quando entrambe le prede sono circondate. Vince chi blocca la preda con il minor numero di mosse!
-
-        </div>
+    <div class="instruzioni">
+        <b>Jager (4 pionnen) vs Prooi (2 pionnen)</b>. De jager begint.<br>
+        <b>Cacciatore (4 pedine) contro Preda (2 pedine)</b>. Il cacciatore inizia.<br>
+        • Spelers bewegen om de beurt 1 kruispunt over de lijnen.<br>
+        • I giocatori si moovono a turno di 1 incrocio lungo le linee.<br>
+        • Je mag niet springen. Pionnen mogen niet op dezelfde plek staan.<br>
+        • <b>Einde:</b> Als beide prooien zijn ingesloten.<br>
+        • Fine: quando entrambe le prede sono circondate.
+    </div>
 
     <div class="spel-container">
         <h1>GIOGO ROMANO</h1>
         <div id="bord-vlak">
-            <svg viewBox="0 0 400 200">
-                <rect x="20" y="20" width="360" height="160" class="lijn" />
-                <line x1="200" y1="20" x2="200" y2="180" class="lijn" />
-                <line x1="200" y1="20" x2="20" y2="75" class="lijn" />
-                <line x1="200" y1="180" x2="20" y2="125" class="lijn" />
-                <line x1="200" y1="20" x2="380" y2="75" class="lijn" />
-                <line x1="200" y1="180" x2="380" y2="125" class="lijn" />
+            <svg viewBox="0 0 500 350">
+                <rect x="50" y="50" width="400" height="250" class="lijn" />
+                <line x1="250" y1="50" x2="250" y2="300" class="lijn" />
+                <line x1="150" y1="50" x2="50" y2="150" class="lijn" />
+                <line x1="150" y1="300" x2="50" y2="200" class="lijn" />
+                <line x1="350" y1="50" x2="450" y2="150" class="lijn" />
+                <line x1="350" y1="300" x2="450" y2="200" class="lijn" />
             </svg>
-            <div class="pion prooi" style="top: 10%; left: 5%;"></div>
-            <div class="pion prooi" style="top: 90%; left: 5%;"></div>
-            <div class="pion jager" style="top: 10%; left: 95%;"></div>
-            <div class="pion jager" style="top: 37%; left: 95%;"></div>
-            <div class="pion jager" style="top: 63%; left: 95%;"></div>
-            <div class="pion jager" style="top: 90%; left: 95%;"></div>
+            
+            <div class="pion prooi" style="top: 14.3%; left: 10%;"></div>
+            <div class="pion prooi" style="top: 85.7%; left: 10%;"></div>
+            
+            <div class="pion jager" style="top: 14.3%; left: 90%;"></div>
+            <div class="pion jager" style="top: 38%; left: 90%;"></div>
+            <div class="pion jager" style="top: 61.7%; left: 90%;"></div>
+            <div class="pion jager" style="top: 85.7%; left: 90%;"></div>
         </div>
     </div>
 
     <div class="score-container">
         <div class="current-stats">
-            <span>Beurt: <span id="curPlayer">Jager</span></span><br>
-
-<span>Turno: <span id="curPlayer">Cacciatore</span></span>
-            <span>Zetten: <span id="moveCount">0</span></span>
+            <span>Turno: <span id="curPlayer">Cacciatore</span></span>
+            <span>Zetten Jager: <span id="moveCount">0</span></span>
         </div>
-        <div class="history-list" id="scoreHistory">
-            </div>
+        <div class="history-list" id="scoreHistory"></div>
         <div class="btn-group">
             <button class="action-btn save-btn" onclick="saveRound()">RONDE OPSLAAN-SALVA ROUND</button>
             <button class="action-btn reset-btn" onclick="resetBoard()">NIEUWE RONDE-NUOVO ROUND</button>
@@ -188,20 +189,21 @@
     </div>
 
 <script>
-    let moves = 0;
+    let hunterMoves = 0;
     let roundCount = 1;
-    let hunterPlayer = 1; // Wie is deze ronde de jager?
+    let hunterPlayer = 1;
     const board = document.getElementById('bord-vlak');
     let selectedPiece = null;
     let offsetX, offsetY;
 
     function startDrag(e) {
+        if (!e.target.classList.contains('pion')) return;
         selectedPiece = e.target;
         const client = e.type.includes('touch') ? e.touches[0] : e;
         const rect = selectedPiece.getBoundingClientRect();
         offsetX = client.clientX - (rect.left + rect.width / 2);
         offsetY = client.clientY - (rect.top + rect.height / 2);
-        selectedPiece.style.zIndex = 100;
+        selectedPiece.style.zIndex = 1000;
     }
 
     function moveDrag(e) {
@@ -216,8 +218,11 @@
 
     function endDrag() {
         if (selectedPiece) {
-            moves++;
-            document.getElementById('moveCount').innerText = Math.floor(moves/2);
+            // Alleen tellen als een JAGER wordt verplaatst
+            if (selectedPiece.classList.contains('jager')) {
+                hunterMoves++;
+                document.getElementById('moveCount').innerText = hunterMoves;
+            }
             selectedPiece.style.zIndex = 10;
             selectedPiece = null;
         }
@@ -227,48 +232,36 @@
         const history = document.getElementById('scoreHistory');
         const scoreEntry = document.createElement('div');
         scoreEntry.className = `score-entry ${hunterPlayer === 1 ? 'p1-row' : 'p2-row'}`;
-        
         const finalMoves = document.getElementById('moveCount').innerText;
-        scoreEntry.innerHTML = `
-            <span>Ronde ${roundCount}: Speler ${hunterPlayer} (Jager)</span>
-            <span>${finalMoves} zetten</span>
-        `;
-        
+        scoreEntry.innerHTML = `<span>Ronde ${roundCount}: Speler ${hunterPlayer} (Jager)</span><span>${finalMoves} zetten</span>`;
         history.prepend(scoreEntry);
-        
-        // Wissel rollen voor de volgende ronde
         roundCount++;
         hunterPlayer = hunterPlayer === 1 ? 2 : 1;
         resetBoard();
     }
 
     function resetBoard() {
-        // Simpele herlaad van pion-posities
         const jagers = document.querySelectorAll('.jager');
         const prooien = document.querySelectorAll('.prooi');
+        prooien[0].style.top = '14.3%'; prooien[0].style.left = '10%';
+        prooien[1].style.top = '85.7%'; prooien[1].style.left = '10%';
+        jagers[0].style.top = '14.3%'; jagers[0].style.left = '90%';
+        jagers[1].style.top = '38%'; jagers[1].style.left = '90%';
+        jagers[2].style.top = '61.7%'; jagers[2].style.left = '90%';
+        jagers[3].style.top = '85.7%'; jagers[3].style.left = '90%';
         
-        prooien[0].style.top = '10%'; prooien[0].style.left = '5%';
-        prooien[1].style.top = '90%'; prooien[1].style.left = '5%';
-        
-        jagers[0].style.top = '10%'; jagers[0].style.left = '95%';
-        jagers[1].style.top = '37%'; jagers[1].style.left = '95%';
-        jagers[2].style.top = '63%'; jagers[2].style.left = '95%';
-        jagers[3].style.top = '90%'; jagers[3].style.left = '95%';
-        
-        moves = 0;
+        // Reset de jager-teller voor de nieuwe ronde
+        hunterMoves = 0;
         document.getElementById('moveCount').innerText = "0";
     }
 
-    document.querySelectorAll('.pion').forEach(p => {
-        p.addEventListener('mousedown', startDrag);
-        p.addEventListener('touchstart', (e) => { e.preventDefault(); startDrag(e); }, {passive: false});
-    });
-
+    document.addEventListener('mousedown', startDrag);
+    document.addEventListener('touchstart', (e) => { startDrag(e); }, {passive: false});
     document.addEventListener('mousemove', moveDrag);
     document.addEventListener('touchmove', (e) => { if(selectedPiece) { e.preventDefault(); moveDrag(e); } }, {passive: false});
     document.addEventListener('mouseup', endDrag);
     document.addEventListener('touchend', endDrag);
 </script>
-
 </body>
 </html>
+
