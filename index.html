@@ -48,6 +48,10 @@ LICENTIE / LICENSE (NL | EN | IT)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gioco Romano - Deluxe Edition</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="theme-color" content="#8b4513">
     <style>
         :root {
             --romano-red: #8b4513;
@@ -174,6 +178,80 @@ LICENTIE / LICENSE (NL | EN | IT)
         }
         .reset-btn { background: #5d4037; }
         .save-btn { background: var(--romano-red); }
+
+        footer.app-footer {
+            width: 100%;
+            max-width: 420px;
+            margin-top: 14px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6b5c47;
+            font-family: "Times New Roman", serif;
+            line-height: 1.5;
+        }
+        footer.app-footer a { color: var(--romano-red); }
+
+        .waardering {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .waardering button {
+            border: none;
+            background: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.55;
+            padding: 4px 6px;
+            border-radius: 50%;
+            transition: opacity 0.2s, transform 0.15s;
+            line-height: 1;
+        }
+        .waardering button:hover { opacity: 1; transform: scale(1.15); }
+        .waardering button.rood { filter: drop-shadow(0 0 0 #c0392b); }
+        .waardering button.geel { filter: drop-shadow(0 0 0 #d4ac0d); }
+        .waardering button.groen { filter: drop-shadow(0 0 0 #27ae60); }
+        .waardering small { display: block; margin-top: 4px; opacity: 0.7; font-size: 0.65rem; }
+
+        #install-banner {
+            position: fixed;
+            left: 50%;
+            bottom: -100px;
+            transform: translateX(-50%);
+            width: calc(100% - 30px);
+            max-width: 400px;
+            background: var(--romano-red);
+            color: #fffaf0;
+            padding: 12px 14px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            z-index: 5000;
+            transition: bottom 0.5s ease;
+        }
+        #install-banner.show { bottom: 16px; }
+        #install-banner span.icon { font-size: 1.5rem; }
+        #install-banner .txt { flex: 1; }
+        #install-banner button {
+            border: none; border-radius: 6px; padding: 7px 10px;
+            font-weight: bold; cursor: pointer; font-size: 0.75rem;
+        }
+        #install-banner .install-yes { background: #fffaf0; color: var(--romano-red); }
+        #install-banner .install-no { background: transparent; color: #fffaf0; opacity: 0.7; }
+
+        #integrity-block {
+            display: none;
+            position: fixed; inset: 0; z-index: 99999;
+            background: #1a1208;
+            color: #e8dfcc;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 30px;
+            font-family: "Times New Roman", serif;
+        }
     </style>
 </head>
 <body>
@@ -229,6 +307,33 @@ LICENTIE / LICENSE (NL | EN | IT)
         <div class="btn-group">
             <button class="action-btn save-btn" onclick="saveRound()">RONDE OPSLAAN-SALVA ROUND</button>
             <button class="action-btn reset-btn" onclick="resetBoard()">NIEUWE RONDE-NUOVO ROUND</button>
+        </div>
+    </div>
+
+    <footer class="app-footer" id="app-footer">
+        © 2026 <span id="copyrightMark">Jan den Hollander</span> ·
+        <a href="mailto:jandenhollander@duck.com">jandenhollander@duck.com</a>
+        <div class="waardering" id="waardering">
+            <button class="rood" title="Niet zo leuk" onclick="stuurWaardering('rood', this)">👎</button>
+            <button class="geel" title="Gaat wel" onclick="stuurWaardering('geel', this)">🤔</button>
+            <button class="groen" title="Leuk!" onclick="stuurWaardering('groen', this)">👍</button>
+        </div>
+        <small id="waardering-status">Vond je dit leuk? Laat het weten.</small>
+    </footer>
+
+    <div id="install-banner">
+        <span class="icon">🏛️</span>
+        <span class="txt">Installeer Gioco Romano als app op je toestel.</span>
+        <button class="install-yes" onclick="installeerApp()">Installeer</button>
+        <button class="install-no" onclick="verbergInstallBanner()">Nee</button>
+    </div>
+
+    <div id="integrity-block">
+        <div>
+            <div style="font-size:2rem;">🏛️</div>
+            <p>Deze kopie van <em>Gioco Romano</em> is gewijzigd of mist de copyrightvermelding
+            en kan daarom niet worden gebruikt.</p>
+            <p style="font-size:0.8rem; opacity:0.8;">© Jan den Hollander — jandenhollander@duck.com</p>
         </div>
     </div>
 
@@ -305,6 +410,115 @@ LICENTIE / LICENSE (NL | EN | IT)
     document.addEventListener('touchmove', (e) => { if(selectedPiece) { e.preventDefault(); moveDrag(e); } }, {passive: false});
     document.addEventListener('mouseup', endDrag);
     document.addEventListener('touchend', endDrag);
+
+    /* ============================================================
+       EERLIJKHEID / INTEGRITEITSCONTROLE
+       Bewaakt dat de copyrightvermelding aanwezig en ongewijzigd
+       blijft. Twee lagen: live-observer + periodieke terugvalcontrole,
+       zodat de blokkade ook werkt als de observer wordt omzeild.
+    ============================================================ */
+    const VEREISTE_TEKST = 'Jan den Hollander';
+    let appGeblokkeerd = false;
+
+    function blockApp() {
+        if (appGeblokkeerd) return;
+        appGeblokkeerd = true;
+        document.getElementById('integrity-block').style.display = 'flex';
+        document.querySelectorAll('body > *:not(#integrity-block)').forEach(el => {
+            if (el.tagName !== 'SCRIPT') el.style.visibility = 'hidden';
+        });
+    }
+
+    function controleerIntegriteit() {
+        const mark = document.getElementById('copyrightMark');
+        const ok = mark && mark.textContent.includes(VEREISTE_TEKST) &&
+                   document.title.toLowerCase().includes('gioco romano');
+        if (!ok) blockApp();
+    }
+
+    const footerEl = document.getElementById('app-footer');
+    if (footerEl) {
+        new MutationObserver(controleerIntegriteit).observe(footerEl, {
+            childList: true, characterData: true, subtree: true
+        });
+    }
+    new MutationObserver(controleerIntegriteit).observe(document.querySelector('title'), {
+        childList: true, characterData: true, subtree: true
+    });
+    // Terugvalcontrole: onafhankelijke periodieke check als vangnet
+    setInterval(controleerIntegriteit, 4000);
+    controleerIntegriteit();
+
+    /* ============================================================
+       WAARDERING — 3 duimpjes in stoplichtkleuren
+       Verstuurt een korte melding via het gedeelde Web3Forms-formulier
+       "Waardering". Vervang de access key door dezelfde key die de
+       andere apps gebruiken.
+    ============================================================ */
+    const WEB3FORMS_ACCESS_KEY = 'PLAK_HIER_JE_WEB3FORMS_ACCESS_KEY';
+
+    function stuurWaardering(kleur, btn) {
+        const statusEl = document.getElementById('waardering-status');
+        const labels = { rood: 'Niet zo leuk 👎', geel: 'Gaat wel 🤔', groen: 'Leuk! 👍' };
+
+        document.querySelectorAll('.waardering button').forEach(b => b.disabled = true);
+        statusEl.textContent = 'Versturen...';
+
+        fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                access_key: WEB3FORMS_ACCESS_KEY,
+                subject: 'Waardering — Gioco Romano',
+                app: 'Gioco Romano',
+                waardering: labels[kleur],
+                pagina: window.location.href
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                statusEl.textContent = 'Bedankt voor je waardering! ' + labels[kleur];
+            } else {
+                statusEl.textContent = 'Kon waardering niet versturen.';
+            }
+        })
+        .catch(() => { statusEl.textContent = 'Kon waardering niet versturen.'; });
+    }
+
+    /* ============================================================
+       PWA — installatiebanner (subtiel) + service worker registratie
+    ============================================================ */
+    let deferredInstallPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        if (localStorage.getItem('giocoRomanoInstallGeweigerd') === '1') return;
+        setTimeout(() => {
+            document.getElementById('install-banner').classList.add('show');
+        }, 4000);
+    });
+
+    function installeerApp() {
+        verbergInstallBanner();
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt = null;
+    }
+
+    function verbergInstallBanner() {
+        document.getElementById('install-banner').classList.remove('show');
+        localStorage.setItem('giocoRomanoInstallGeweigerd', '1');
+    }
+
+    window.addEventListener('appinstalled', verbergInstallBanner);
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        });
+    }
 </script>
  
 </body>
